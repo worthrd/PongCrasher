@@ -91,6 +91,8 @@
     <Content Include="Images\prisoner.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="LICENCE.txt" />
+    <Content Include="README.txt" />
     <None Include="Resources\wallpaper.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
