@@ -21,7 +21,8 @@ namespace TestForm.Game.Weapons
         public override void Draw(System.Drawing.Graphics g, System.Drawing.Pen p)
         {
             base.Draw(g, p);
-            //Draw weapon in front of player
+            //Draw weapon in front of player test here
+
         }
     }
 }
