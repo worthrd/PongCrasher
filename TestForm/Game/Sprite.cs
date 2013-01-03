@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using TestForm.Game.Draw;
 
 namespace TestForm.Game
 {
@@ -11,10 +12,21 @@ namespace TestForm.Game
         public PointF Location;
         public PointF Velocity;
         public SizeF Size;
+        Drawer drawer;
+
+        public Drawer Drawer
+        {
+            get { return drawer; }
+            set { drawer = value; }
+        }
 
 
         public Sprite()
         {
+        }
+        public Sprite(float x, float y, float width, float height,Drawer drawer) :this(x, y, width, height)
+        {
+            this.Drawer = drawer;
         }
         public Sprite(float x, float y, float width, float height) 
         {
@@ -31,9 +43,9 @@ namespace TestForm.Game
             Location.Y += Velocity.Y * (float)elapsedTime;
         }
 
-        public virtual void Draw(Graphics g, Pen p) 
+        public virtual void Draw() 
         {
-          //Do something in inherited methods
+            Drawer.Draw();
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using TestForm.Game;
+using TestForm.Game.Weapons;
 
 namespace TestForm
 {
@@ -22,6 +23,7 @@ namespace TestForm
         private Wall _player2;
         private Ball _ball_1;
         private GameState gameState;
+        private GameSettings settings;
 
         public Crasher()
         {
@@ -30,26 +32,28 @@ namespace TestForm
 
             gameState = new GameState();
 
-            Brick.Height = 20;
-            Brick.Width = 20;
+             settings = GameSettings.GetInstance();
 
-            Wall.Width = 40;
-            Wall.Height = 200;
+            Brick.Height = settings.BrickHeight;
+            Brick.Width = settings.BrickWidth;
 
-            Ball.Radius = 20;
-            Ball.InitialSpeed = 400.0;
+            Wall.Width = settings.WallWidth;
+            Wall.Height = settings.WallHeight;
+
+            Ball.Radius = settings.BallRadius;
+            Ball.InitialSpeed = settings.BallInitialSpeed;
 
             //Create the bat Sprites - they need the keyboard controls and the gameplay area limits
-            _player1 = new Wall(30.0f,Keys.Up,Keys.Down ,0.0f, (float)ClientSize.Height, Wall.Width, Wall.Height);
+            _player1 = new Wall(settings.PlayerDefaultX,Keys.Up,Keys.Down ,settings.MinPosition, (float)ClientSize.Height, Wall.Width, Wall.Height);
 
             //use this line for a second human player
             //_player2 = new Bat(player2Bat, ClientSize.Width - 30 - Bat.Width, Keys.P, Keys.L, 0, ClientSize.Height);
 
             //use this line for a computer player
-            _player2 = new Wall((float)ClientSize.Width - 30.0f - Wall.Width, 0.0f, (float)ClientSize.Height, Wall.Width, Wall.Height);
+            _player2 = new Wall((float)ClientSize.Width - settings.PlayerDefaultX - Wall.Width, settings.MinPosition, (float)ClientSize.Height, Wall.Width, Wall.Height);
 
 
-            _ball_1 = new Ball(0.0f, (float)ClientSize.Width, 0.0f, (float)ClientSize.Height, gameState, ref _player1, ref _player2);
+            _ball_1 = new Ball(settings.BallMinX, (float)ClientSize.Width, settings.BallMinY, (float)ClientSize.Height, gameState, ref _player1, ref _player2);
 
             _player1.Ball = _ball_1;
 
@@ -63,9 +67,7 @@ namespace TestForm
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            Pen p = new Pen(Color.Black, 3);
-            p.Brush = Brushes.Black;
-            Graphics g = e.Graphics;
+            settings.Graphics= e.Graphics;
 
             //Work out how long since we were last here in seconds
             double gameTime = _timer.ElapsedMilliseconds / 1000.0;
@@ -78,22 +80,19 @@ namespace TestForm
             _player2.Update(gameTime, elapsedTime);
             _ball_1.Update(gameTime, elapsedTime);
 
-            //Draw the scores
-            //player1Score.Text = gameState.Player1Score.ToString();
-            //player1Score.Refresh();
-            //player2Score.Text = gameState.Player2Score.ToString();
-            //player2Score.Refresh();
 
             //Draw the scores
             Font myFont = new System.Drawing.Font("Arial", 12);
             PointF pfScore = new PointF(this.ClientSize.Width / 2 - 100  , 10);
-            g.DrawString(String.Format("Player1 : {0} / Player2: {1}", gameState.Player1Score.ToString(), gameState.Player2Score.ToString()),myFont,p.Brush,pfScore);
+            settings.Graphics.DrawString(String.Format("Player1 : {0} / Player2: {1}", gameState.Player1Score.ToString(), gameState.Player2Score.ToString()), myFont, settings.Pen.Brush, pfScore);
 
+            Sprite shotGun = new ShotGun(_player1, _player2, _ball_1);
+            _player1.Weapons.Add(shotGun);
 
             //and the game objects
-            _player1.Draw(g, p);
-            _player2.Draw(g, p);
-            _ball_1.Draw(g, p);
+            _player1.Draw();
+            _player2.Draw();
+            _ball_1.Draw();
 
             //Force the next Paint()
             this.Invalidate();

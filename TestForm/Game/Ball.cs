@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using TestForm.Game.Draw;
 
 namespace TestForm.Game
 {
@@ -62,6 +63,8 @@ namespace TestForm.Game
 
             //Preload the sound file
             //_beep.Load();
+
+            this.Drawer = new BallDrawer(this);
         }
 
 
@@ -76,6 +79,7 @@ namespace TestForm.Game
             Velocity = new PointF((float)Ball.InitialSpeed * ((_random.Next(2) * 2) - 1), (float)Ball.InitialSpeed *((_random.Next(2) * 2) - 1));
         }
 
+        /*
         public override void Draw(System.Drawing.Graphics g, System.Drawing.Pen p)
         {
             base.Draw(g, p);
@@ -87,7 +91,7 @@ namespace TestForm.Game
             //g.DrawString(string.Format("X:{0} Y:{1}", ((int)Location.X).ToString(), ((int)Location.Y).ToString()), myFont, p.Brush, this.Location);
              
         }
-
+        */
 
         /// <summary>
         /// Moves the ball handling bouncing off walls, bats and scoring when you miss

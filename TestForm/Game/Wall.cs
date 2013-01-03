@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
+using TestForm.Game.Draw;
 
 namespace TestForm.Game
 {
@@ -83,6 +84,14 @@ namespace TestForm.Game
             set { bricksOnALine = value; }
         }
 
+        List<Sprite> weapons;
+
+        public List<Sprite> Weapons
+        {
+            get { return weapons; }
+            set { weapons = value; }
+        }
+
 
         //Constructor for ai wall
         public Wall(float x, float minPosition, float maxPosition, float width, float height)
@@ -95,8 +104,12 @@ namespace TestForm.Game
             Bricks = new List<Brick>();
             Hits = new List<int>();
 
+            Weapons = new List<Sprite>(); 
+
             NumberOfLines = Convert.ToInt16(Size.Width / Brick.Width);
             BricksOnALine = Convert.ToInt16(Size.Height / Brick.Height);
+
+            this.Drawer = new WallDrawer(this);
         }
 
 
@@ -113,11 +126,14 @@ namespace TestForm.Game
             //Set wall brick capacity
             Bricks = new List<Brick>();
             Hits = new List<int>();
+            Weapons = new List<Sprite>(); 
 
             NumberOfLines = Convert.ToInt16(Size.Width / Brick.Width);
             BricksOnALine = Convert.ToInt16(Size.Height / Brick.Height);
 
             _isHuman = true;
+
+            this.Drawer = new WallDrawer(this);
         }
 
         //Shared construction code
@@ -132,6 +148,8 @@ namespace TestForm.Game
 
             //The Y position should be in the center
             Location.Y = (MaxPosition - MinPosition - Height) / 2;
+
+
         }
 
         /// <summary>
@@ -156,7 +174,15 @@ namespace TestForm.Game
             //Limit the animation to the screen
             if (Location.Y < MinPosition) Location.Y = MinPosition;
             if (Location.Y > MaxPosition - Height) Location.Y = MaxPosition - Height;
+
+            foreach (var w in this.Weapons)
+            {
+                w.Update(gameTime,elapsedTime);
+            }
+
+           
         }
+
 
         private void computerMove()
         {
@@ -312,23 +338,33 @@ namespace TestForm.Game
             }
             return false;
         }
+
        
-        public override void Draw(System.Drawing.Graphics g, System.Drawing.Pen p)
+        public override void Draw()
         {
 
-            base.Draw(g, p);
+            base.Draw();
 
             //Test lines
             //Pen pLine = new Pen(Color.DarkBlue, 1);
             //pLine.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
 
+            foreach (var w in this.Weapons)
+            {
+                w.Draw();
+            }
+        }
+
+        /*
+        private void DrawBricks(System.Drawing.Graphics g, System.Drawing.Pen p)
+        {
             int id = 0;
             Bricks = new List<Brick>();
             for (int i = 0; i < NumberOfLines; i++)
             {
                 for (int j = 0; j < BricksOnALine; j++)
                 {
-                    
+
                     float _x = Location.X + i * Brick.Width;
                     float _y = Location.Y + j * Brick.Height;
 
@@ -336,22 +372,28 @@ namespace TestForm.Game
                     {
 
                         Brick b = new Brick(_x, _y, Brick.Width, Brick.Height, id);
-                        b.Draw(g, p);
+                        b.Draw();
+                        //b.Draw(g, p);
+
                         //Test Lines
                         //PointF pBall = new PointF(Ball.Location.X + Ball.Radius / 2, Ball.Location.Y + Ball.Radius / 2);
                         //PointF pBrick = new PointF(b.Location.X + Brick.Width / 2, b.Location.Y + Brick.Width / 2);
                         //g.DrawLine(pLine, pBall, pBrick);
                         Bricks.Add(b);
-                       
+
                     }
                     else
                     {
                         Brick b = new Brick(_x, _y, Brick.Width, Brick.Height, id);
-                        b.DrawDashed(g);
+                        b.Drawer = new BrickDrawerDashed(b);
+                        
+                        //b.DrawDashed(g);
+
                     }
                     id += 1;
                 }
             }
         }
+        */
     }
 }

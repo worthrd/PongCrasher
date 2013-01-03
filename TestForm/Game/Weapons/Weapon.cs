@@ -16,13 +16,6 @@ namespace TestForm.Game
             set { arsenal = value; }
         }
 
-        Int32 damagePower;
-
-        public Int32 DamagePower
-        {
-            get { return damagePower; }
-            set { damagePower = value; }
-        }
 
         Int64 avaliableShot;
 
@@ -63,6 +56,25 @@ namespace TestForm.Game
         {
             get { return ball; }
             set { ball = value; }
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            foreach (Ammo item in Arsenal)
+            {
+                item.Draw();
+            }
+        }
+
+
+        public override void Update(double gameTime, double elapsedTime)
+        {
+            base.Update(gameTime, elapsedTime);
+            foreach (Ammo item in Arsenal)
+            {
+                item.Update(gameTime, elapsedTime);
+            }
         }
 
         public virtual void Use() 
