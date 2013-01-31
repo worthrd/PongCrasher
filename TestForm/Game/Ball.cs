@@ -142,7 +142,7 @@ namespace TestForm.Game
         /// <returns></returns>
         private bool collision(Wall bat)
         {
-            return (bat.IsHit(this.Location.X,this.Location.Y));
+            return (bat.IsHit(this.Location.X,this.Location.Y,Ball.Radius));
         }
 
 

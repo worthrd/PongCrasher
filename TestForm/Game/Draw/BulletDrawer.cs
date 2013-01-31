@@ -15,7 +15,11 @@ namespace TestForm.Game.Draw
         public override void Draw()
         {
             base.Draw();
-            G.DrawEllipse(P, S.Location.X, S.Location.Y, S.Size.Width, S.Size.Height);
+            if (GameSettings.GetInstance().BallMaxX>S.Location.X && GameSettings.GetInstance().BallMaxY > S.Location.Y)
+            {
+                G.DrawEllipse(P, S.Location.X, S.Location.Y, S.Size.Width, S.Size.Height);
+            }
+            
         }
     }
 }

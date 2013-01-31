@@ -9,23 +9,24 @@ namespace TestForm.Game.Weapons
     public class Bullet : Ammo
     {
 
-        public Bullet(Sprite owner) 
+        public Bullet(Sprite owner) : base(owner)
         {
-            this.owner = owner;
             this.Location.X = Owner.Location.X + Owner.Size.Width;
-            //this.Location.Y = Owner.Location.Y + Owner.Size.Height / 2;
-            this.Location.Y = 100;
             this.Size.Width = this.Size.Height =  GameSettings.GetInstance().BulletWidthHeight;
+            this.Location.Y = Owner.Location.Y - (Owner.Size.Height - this.Size.Height) / 2 ;
             this.DamagePower = 10;
             this.Drawer = new BulletDrawer(this);
         }
 
-        Sprite owner;
-
-        public Sprite Owner
+     
+        public override void Update(double gameTime, double elapsedTime)
         {
-            get { return owner; }
-            set { owner = value; }
+            base.Update(gameTime, elapsedTime);
+            if (!IsDraw)
+            {
+                this.Location.Y = Owner.Location.Y - (Owner.Size.Height - this.Size.Height) / 2;
+            }
+
         }
     }
 }

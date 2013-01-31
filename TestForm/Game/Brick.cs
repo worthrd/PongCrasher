@@ -43,6 +43,7 @@ namespace TestForm.Game
         {
             Id = id;
             this.Drawer = new BrickDrawer(this); 
-        } 
+        }
+
     }
 }

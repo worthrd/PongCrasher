@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using TestForm.Game.Draw;
+using System.Windows.Forms;
 
 namespace TestForm.Game
 {
-    public class Sprite
+    public abstract class Sprite
     {
         public PointF Location;
         public PointF Velocity;
         public SizeF Size;
+        
         Drawer drawer;
 
         public Drawer Drawer
@@ -47,5 +49,11 @@ namespace TestForm.Game
         {
             Drawer.Draw();
         }
+
+        public virtual void KeyPress(Char keyChar) 
+        {
+        
+        }
+
     }
 }

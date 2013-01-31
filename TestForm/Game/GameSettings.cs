@@ -10,7 +10,15 @@ namespace TestForm.Game
     {
         private static readonly GameSettings instance = new GameSettings();
 
-        private int defaultAmmo = 10;
+        float ammoSpeed = 200;
+
+        public float AmmoSpeed
+        {
+            get { return ammoSpeed; }
+            set { ammoSpeed = value; }
+        }
+
+        private int defaultAmmo = 100;
 
         public int DefaultAmmo
         {
@@ -96,6 +104,22 @@ namespace TestForm.Game
         {
             get { return ballMinY; }
             set { ballMinY = value; }
+        }
+
+        float ballMaxX;
+
+        public float BallMaxX
+        {
+            get { return ballMaxX; }
+            set { ballMaxX = value; }
+        }
+
+        float ballMaxY;
+
+        public float BallMaxY
+        {
+            get { return ballMaxY; }
+            set { ballMaxY = value; }
         }
 
         float bulletWidthHeight = 10;

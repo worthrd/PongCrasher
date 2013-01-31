@@ -264,7 +264,7 @@ namespace TestForm.Game
             Velocity.Y = (float)velocity;
         }
 
-        public void KeyDown(Keys keys)
+        public  void KeyDown(Keys keys)
         {
             //If the key from the key down event matches the up or down key for this bat
             //then set the keyboard state to indicate that this key is currently being held down
@@ -292,8 +292,18 @@ namespace TestForm.Game
             {
                 _isDownKeyPressed = false;
             }
+
         }
 
+        public override void KeyPress(Char key)
+        {
+            base.KeyPress(key);
+            //Send keys to weapons for use of them
+            foreach (var item in Weapons)
+            {
+                item.KeyPress(key);
+            }
+        }
 
         public bool IsBrickExists(int id) 
         {
@@ -312,12 +322,12 @@ namespace TestForm.Game
             return !(Hits.IndexOf(id) >= 0);
         }
 
-        public bool IsHit(float x, float y) 
+        public bool IsHit(float x, float y,float spriteWidth) 
         {
             bool hit = false;
             foreach (Brick b in Bricks)
             {
-                if (Collision(new PointF(b.Location.X + Brick.Width / 2,b.Location.Y + Brick.Width / 2),new PointF(x+Ball.Radius/2,y+Ball.Radius/2)))
+                if (Collision(new PointF(b.Location.X + Brick.Width / 2, b.Location.Y + Brick.Width / 2), new PointF(x + spriteWidth / 2, y + spriteWidth / 2)))
                 {
                      Hits.Add(b.Id); hit =  true;
                 } 
@@ -355,45 +365,5 @@ namespace TestForm.Game
             }
         }
 
-        /*
-        private void DrawBricks(System.Drawing.Graphics g, System.Drawing.Pen p)
-        {
-            int id = 0;
-            Bricks = new List<Brick>();
-            for (int i = 0; i < NumberOfLines; i++)
-            {
-                for (int j = 0; j < BricksOnALine; j++)
-                {
-
-                    float _x = Location.X + i * Brick.Width;
-                    float _y = Location.Y + j * Brick.Height;
-
-                    if (IsBrickDrawn(id))
-                    {
-
-                        Brick b = new Brick(_x, _y, Brick.Width, Brick.Height, id);
-                        b.Draw();
-                        //b.Draw(g, p);
-
-                        //Test Lines
-                        //PointF pBall = new PointF(Ball.Location.X + Ball.Radius / 2, Ball.Location.Y + Ball.Radius / 2);
-                        //PointF pBrick = new PointF(b.Location.X + Brick.Width / 2, b.Location.Y + Brick.Width / 2);
-                        //g.DrawLine(pLine, pBall, pBrick);
-                        Bricks.Add(b);
-
-                    }
-                    else
-                    {
-                        Brick b = new Brick(_x, _y, Brick.Width, Brick.Height, id);
-                        b.Drawer = new BrickDrawerDashed(b);
-                        
-                        //b.DrawDashed(g);
-
-                    }
-                    id += 1;
-                }
-            }
-        }
-        */
     }
 }

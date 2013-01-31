@@ -32,7 +32,7 @@ namespace TestForm
 
             gameState = new GameState();
 
-             settings = GameSettings.GetInstance();
+            settings = GameSettings.GetInstance();
 
             Brick.Height = settings.BrickHeight;
             Brick.Width = settings.BrickWidth;
@@ -42,6 +42,10 @@ namespace TestForm
 
             Ball.Radius = settings.BallRadius;
             Ball.InitialSpeed = settings.BallInitialSpeed;
+
+            settings.BallMaxX = (float)ClientSize.Width;
+
+            settings.BallMaxY = (float)ClientSize.Height;
 
             //Create the bat Sprites - they need the keyboard controls and the gameplay area limits
             _player1 = new Wall(settings.PlayerDefaultX,Keys.Up,Keys.Down ,settings.MinPosition, (float)ClientSize.Height, Wall.Width, Wall.Height);
@@ -63,6 +67,16 @@ namespace TestForm
             //Initialise and start the timer
             _lastTime = 0.0;
             _timer.Start();
+
+           
+            Sprite shotGun = new ShotGun(_player1, _player2, _ball_1);
+            Sprite shotGun2 = new ShotGun(_player1, _player2, _ball_1);
+            _player1.Weapons.Add(shotGun);
+            _player1.Weapons.Add(shotGun2);
+            /*
+           ((Weapon)shotGun).Use();
+           */ 
+            
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -81,13 +95,7 @@ namespace TestForm
             _ball_1.Update(gameTime, elapsedTime);
 
 
-            //Draw the scores
-            Font myFont = new System.Drawing.Font("Arial", 12);
-            PointF pfScore = new PointF(this.ClientSize.Width / 2 - 100  , 10);
-            settings.Graphics.DrawString(String.Format("Player1 : {0} / Player2: {1}", gameState.Player1Score.ToString(), gameState.Player2Score.ToString()), myFont, settings.Pen.Brush, pfScore);
-
-            Sprite shotGun = new ShotGun(_player1, _player2, _ball_1);
-            _player1.Weapons.Add(shotGun);
+            DrawScoresAndBonus();
 
             //and the game objects
             _player1.Draw();
@@ -98,6 +106,30 @@ namespace TestForm
             this.Invalidate();
 
          
+        }
+
+        private void DrawScoresAndBonus()
+        {
+            //Draw the scores
+            Font myFont = new System.Drawing.Font("Arial", 12);
+            PointF pfScore = new PointF(this.ClientSize.Width / 2 - 100, 10);
+            settings.Graphics.DrawString(String.Format("Player1 : {0} / Player2: {1}", gameState.Player1Score.ToString(), gameState.Player2Score.ToString()), myFont, settings.Pen.Brush, pfScore);
+
+            Pen p = new Pen(Brushes.Black, 2.00f);
+            p.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+
+            int nextX = 0;
+            int slotX = (int)settings.BrickWidth;
+            int slotY = (int)settings.BrickWidth;
+            int weaponSlotWidth = (int)settings.BrickWidth * 2;
+            int weaponSlotHeight = (int)settings.BrickWidth * 2;
+
+
+            foreach (Weapon w in this._player1.Weapons)
+            {
+                settings.Graphics.DrawEllipse(p, new Rectangle(slotX + nextX, slotY, weaponSlotWidth, weaponSlotHeight));
+                nextX += (int)settings.BrickWidth + weaponSlotWidth;
+            }
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -114,178 +146,11 @@ namespace TestForm
             _player2.KeyUp(e.KeyCode);
         }
 
-
-        /* OLD Codes 
-
-        int p1X;
-        int p1Y;
-        int p2X;
-        int p2Y;
-
-        int moveSpeed = 20;
-        int brickLines = 3;
-        int bricksOnLine = 20;
-        int brickHeight = 16;
-        int brickWidth = 8;
-        int distanceFromEdges = 100;
-
-        int minX;
-        int minY;
-        int maxX;
-        int maxY;
-
-        int ballX;
-        int ballY;
-        int radius = 30;
-
-        List<BrickPosition> playerBlocks = new List<BrickPosition>();
-
-        bool init = true;
-
-        public Form1()
+        private void Crasher_KeyPress(object sender, KeyPressEventArgs e)
         {
-            InitializeComponent();
-            this.SetStyle(ControlStyles.SupportsTransparentBackColor | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.DoubleBuffer, true);
+            //Pass the key presses to the bats
+            _player1.KeyPress(e.KeyChar);
+            _player2.KeyPress(e.KeyChar);
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            SetPlayArea();
-
-        }
-
-        private void SetPlayArea()
-        {
-            p1X = distanceFromEdges - brickLines * brickWidth;
-            p2X = this.ClientSize.Width - distanceFromEdges;
-            p1Y = p2Y = (this.ClientSize.Height - brickHeight * bricksOnLine) / 2;
-
-            minX = 0;
-            minY = 0;
-            maxX = this.ClientSize.Width;
-            maxY = this.ClientSize.Height;
-
-
- 
-
-        }
-
-        private void Form1_Paint(object sender, PaintEventArgs e)
-        {
-
-            Pen pDraw = new Pen(Color.Black, 2);
-            Graphics g = e.Graphics;
-
-            if (init)
-            {
-                ballX = 300;
-                ballY = 300;
-                Rectangle rect = new Rectangle(ballX, ballY, radius, radius);
-                g.FillEllipse(Brushes.Green, rect);
-                g.DrawEllipse(pDraw, rect);
-            }
-            
-
-            for (int i = 0; i < brickLines; i++)
-            {
-                int _startY1 = p1Y;
-                int _startY2 = p2Y;
-
-                for (int j = 0; j < bricksOnLine; j++)
-                {
-
-                    if (i % 2 != 0 && (j == 0 || j == bricksOnLine - 1))
-                    {
-                        if (j == bricksOnLine - 1)
-                        {
-                            //Player1
-                            CreatePlayerBlock(pDraw, g, p1X + i * brickWidth, _startY1, brickWidth, brickHeight, Brushes.LightYellow,1);
-                            //Player2
-                            CreatePlayerBlock(pDraw, g, p2X + i * brickWidth, _startY2, brickWidth, brickHeight, Brushes.LightYellow,2);
-
-                            _startY1 += brickHeight;
-                            _startY2 += brickHeight;
-
-                            //Player1
-                            CreatePlayerBlock(pDraw, g, p1X + i * brickWidth, _startY1, brickWidth, brickHeight/2, Brushes.LightYellow,1);
-                            //Player2
-                            CreatePlayerBlock(pDraw, g, p2X + i * brickWidth, _startY2, brickWidth, brickHeight/2, Brushes.LightYellow,2);
-                            break;
-                        }
-                        else
-                        {
-                            //Player1
-                            CreatePlayerBlock(pDraw, g, p1X + i * brickWidth, _startY1, brickWidth, brickHeight / 2, Brushes.LightYellow,1);
-                            //Player2
-                            CreatePlayerBlock(pDraw, g, p2X + i * brickWidth, _startY2, brickWidth, brickHeight / 2, Brushes.LightYellow,2);
-                            _startY1 += brickHeight / 2;
-                            _startY2 += brickHeight / 2;
-                        }
-
-                    }
-                    else
-                    {
-                        //Player1
-                        CreatePlayerBlock(pDraw, g, p1X + i * brickWidth, _startY1, brickWidth, brickHeight, Brushes.LightYellow,1);
-                        //Player2
-                        CreatePlayerBlock(pDraw, g, p2X + i * brickWidth, _startY2, brickWidth, brickHeight, Brushes.LightYellow,2);
-                        _startY1 += brickHeight;
-                        _startY2 += brickHeight;
-                    }
-                    
-                }
-            }
-
-            init = false;
-
-            this.Invalidate();
-        }
-
-   
-        private void CreatePlayerBlock(Pen pDraw, Graphics g, int x, int y, int width,int height, Brush b,int player)
-        {
-
-           
-                Rectangle rect = new Rectangle(x, y, width, height);
-                g.FillRectangle(b, rect);
-                g.DrawRectangle(pDraw, rect);
-           
-                
-            if (init)
-            {
-                playerBlocks.Add(new BrickPosition() { X = x, Y = y, Player = player });
-            }
-               
-            
-            
-        }
-
-        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar=='s')
-            {
-                p1Y += moveSpeed;
-            }
-            else if (e.KeyChar=='w')
-            {
-                p1Y -= moveSpeed;
-            }
-
-
-
-            if (e.KeyChar == 'o')
-            {
-                p2Y -= moveSpeed;
-            }
-            else if (e.KeyChar =='l')
-            {
-                p2Y += moveSpeed;
-            }
- 
-
-
-            this.Invalidate();
-        }
-        */
     }
 }
